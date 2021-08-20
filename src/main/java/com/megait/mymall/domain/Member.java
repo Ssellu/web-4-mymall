@@ -27,7 +27,7 @@ public class Member {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 63)
     private String email; // username 역할
 
     @Column(nullable = false)
@@ -39,14 +39,14 @@ public class Member {
     private LocalDateTime joinedAt; // 가입일자
 
     @Column(nullable = false)
-    @ColumnDefault("false")
+    @ColumnDefault("false") // default false
     private boolean emailVerified;  // 이메일 인증 여부
 
     private String emailCheckToken; // 이메일 인증에 사용할 임의의 문자열
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @ColumnDefault("'ROLE_USER'")
+    @ColumnDefault("'ROLE_USER'") // default 'ROLE_USER'
     private MemberType memberType;  // 회원 유형
 
     @ManyToMany(cascade = CascadeType.ALL)  // 다대다 양방향

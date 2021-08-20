@@ -38,7 +38,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 */
         http
                 .authorizeRequests()
-                        .mvcMatchers("/"/*, "/login"*/)
+                        .mvcMatchers("/", "/mypage2")
                         .permitAll()
 
                         .antMatchers("/mypage/**")
