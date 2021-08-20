@@ -3,9 +3,8 @@ package com.megait.mymall.service;
 import com.megait.mymall.domain.Member;
 import com.megait.mymall.domain.MemberType;
 import com.megait.mymall.repository.MemberRepository;
+import com.megait.mymall.util.MemberUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service // @Controller 와 @Repository 사이의 비지니스 로직 담당
@@ -60,31 +58,26 @@ public class MemberService implements UserDetailsService {
      * @throws UsernameNotFoundException
      *
      */
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Member> optional = memberRepository.findByEmail(username);
-        Member member = optional.orElseThrow(
-                () -> new UsernameNotFoundException("미등록 계정")
-        );
+@Override
+public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    Optional<Member> optional = memberRepository.findByEmail(username);
+    Member member = optional.orElseThrow(
+            () -> new UsernameNotFoundException("미등록 계정")
+    );
 
-        // authentication : 인증 (로그인)
-        // authority : 인가(권한). 인증 뒤에 체크하는 것.
-        //          -> 'ROLE_'로 시작하는 문자열. ~> GrantedAuthority 인터페이스
+    // authentication : 인증 (로그인)
+    // authority : 인가(권한). 인증 뒤에 체크하는 것.
+    //          -> 'ROLE_'로 시작하는 문자열. ~> GrantedAuthority 인터페이스
 
-        /*MemberType memberType = member.getMemberType();
-                   //  MemberType.ROLE_ADMIN / MemberType.ROLE_USER
-        String type = memberType.name();
-                    // "ROLE_ADMIN"  /  "ROLE_USER"
-        GrantedAuthority authority = new SimpleGrantedAuthority(type);
+    /*MemberType memberType = member.getMemberType();
+               //  MemberType.ROLE_ADMIN / MemberType.ROLE_USER
+    String type = memberType.name();
+                // "ROLE_ADMIN"  /  "ROLE_USER"
+    GrantedAuthority authority = new SimpleGrantedAuthority(type);
 
-        HashSet<GrantedAuthority> set = new HashSet<>();
-        set.add(authority);*/
+    HashSet<GrantedAuthority> set = new HashSet<>();
+    set.add(authority);*/
 
-        UserDetails userDetails = new User(
-                member.getEmail(),
-                member.getPassword(),
-                List.of(new SimpleGrantedAuthority(member.getMemberType().name()))
-                );
-        return userDetails;
-    }
+    return new MemberUser(member);
+}
 }
