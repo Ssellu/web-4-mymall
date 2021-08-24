@@ -2,18 +2,40 @@ package com.megait.mymall.controller;
 
 import com.megait.mymall.domain.Member;
 import com.megait.mymall.repository.MemberRepository;
+import com.megait.mymall.service.MemberService;
 import com.megait.mymall.util.CurrentMember;
+import com.megait.mymall.validation.JoinFormValidator;
+import com.megait.mymall.validation.JoinFormVo;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.Valid;
 import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
 public class MainController {
+
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final MemberService memberService;
+    private final MemberRepository memberRepository;
+
+
+    @InitBinder("joinFormVo") // 요청 전에 추가할 설정들 (Controller 에서 사용)
+    protected void initBinder(WebDataBinder dataBinder){
+        dataBinder.addValidators(new JoinFormValidator(memberRepository));
+    }
+
 
     @RequestMapping("/")
     public String index(Principal principal, Model model){
@@ -29,7 +51,7 @@ public class MainController {
     public String login(){
         return "member/login";
     }
-    private final MemberRepository memberRepository;
+
 
     /*@GetMapping("/mypage")
     public String mypage(Model model, Principal principal) {
@@ -64,5 +86,25 @@ public class MainController {
         return "member/mypage";
     }
 
+    @GetMapping("/signup")
+    public String signupForm(Model model){
+        model.addAttribute("joinFormVo", new JoinFormVo());
+        return "member/signup";
+    }
+
+    @PostMapping("/signup")
+    public String signupSubmit(@Valid JoinFormVo joinFormVo, Errors errors){
+        log.info("joinFormVo : {}", joinFormVo);
+        if(errors.hasErrors()){
+            log.info("회원가입 에러 : {}", errors.getAllErrors());
+            return "member/signup";
+        }
+
+        log.info("회원가입 정상!");
+
+        memberService.processNewMember(joinFormVo);
+
+        return "redirect:/"; // "/" 로 리다이렉트
+    }
 
 }
