@@ -121,7 +121,7 @@ public class MemberService implements UserDetailsService {
      * 강제 로그인
      * @param member
      */
-    private void login(Member member) {
+    public void login(Member member) {
         MemberUser user = new MemberUser(member);
 
         // 유저 정보를 담은 인증 토큰 생성

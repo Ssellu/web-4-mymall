@@ -13,13 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,11 +34,12 @@ public class MainController {
 
 
     @RequestMapping("/")
-    public String index(Principal principal, Model model){
+    public String index(Model model, @CurrentMember Member member){
         String message = "안녕하세요, 손님!";
-        if(principal != null){
-            message = "안녕하세요, " + principal.getName() + "님!";
+        if(member != null){
+            message = "안녕하세요, " + member.getName() + "님!";
         }
+        model.addAttribute("member", member);
         model.addAttribute("msg", message);
         return "index";
     }
@@ -72,17 +69,16 @@ public class MainController {
     }*/
 
 
-    @RequestMapping("/mypage2")
+    @RequestMapping("/mypage/{email}")
     public String mypage(Model model,
-                         @CurrentMember Member member){
+                         @CurrentMember Member member,
+                         @PathVariable String email){
 
-            // #this   ==> 이 객체 (자바의 this를 의미함)
-            //              이 곳에서의 this는 로그인 중인 User형 객체. ==> 시큐리티의 User 객체를 의미.
-            // member ==> this.getNam
-
-        if(member != null) {
-            model.addAttribute("member", member);
+        if(member == null || !member.getEmail().equals(email)) {
+            return "redirect:/";
         }
+
+        model.addAttribute("member", member);
         return "member/mypage";
     }
 
