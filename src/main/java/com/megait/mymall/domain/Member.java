@@ -71,4 +71,5 @@ public class Member {
         if (cart == null) cart = new ArrayList<>();
         if (orders == null) orders = new ArrayList<>();
     }
+
 }
