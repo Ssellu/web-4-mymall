@@ -36,4 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-**-smtp.properties
+### smtp properties ###
+src/main/resources/application-smtp.properties
