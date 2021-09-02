@@ -2,19 +2,32 @@ package com.megait.mymall.configuration;
 // 시큐리티 관련 Configuration 빈
 
 import com.megait.mymall.service.CustomOAuth2UserService;
+import com.megait.mymall.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+
+    private final MemberService memberService;
+
+    private final DataSource dataSource; // DBCP
+
 
 
     // 웹 관련 보안 설정 (예). 방화벽)
@@ -65,12 +78,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         .logoutUrl("/logout") // 로그아웃을 실행할 url. 디폴트는 "/logout"
                         .invalidateHttpSession(true) // 로그아웃 완료 시 세션을 종료시킬 것인가.
                         .logoutSuccessUrl("/")
+                .and()
+                        .rememberMe()
+                        .userDetailsService(memberService)
+                        .tokenRepository(tokenRepository())
+
 
                 .and()
                         .oauth2Login()
                         .loginPage("/login")
                         .userInfoEndpoint()
                         .userService(customOAuth2UserService)
+
         ;
+    }
+
+    @Bean
+    public PersistentTokenRepository tokenRepository() {
+        // PersistentTokenRepository : rememberMe 선택한 사용자들의 토큰값을 관리한다.
+        JdbcTokenRepositoryImpl jdbcTokenRepository =
+                new JdbcTokenRepositoryImpl();
+
+        jdbcTokenRepository.setDataSource(dataSource);
+        return jdbcTokenRepository;
     }
 }
