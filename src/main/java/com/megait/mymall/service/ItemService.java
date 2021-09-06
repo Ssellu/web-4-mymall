@@ -2,6 +2,7 @@ package com.megait.mymall.service;
 
 import com.megait.mymall.domain.Album;
 import com.megait.mymall.domain.Book;
+import com.megait.mymall.domain.Category;
 import com.megait.mymall.repository.AlbumRepository;
 import com.megait.mymall.repository.BookRepository;
 import com.megait.mymall.repository.CategoryRepository;
@@ -9,16 +10,16 @@ import com.megait.mymall.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-//@Service
+@Service
 @RequiredArgsConstructor
 @Slf4j
 public class ItemService {
@@ -29,53 +30,63 @@ public class ItemService {
     private final CategoryRepository categoryRepository;
 
     @PostConstruct
-    public void createItems() throws IOException {
+    public void createItems() throws IOException{
+        log.info("createItems()");
+        createAlbumItems();
+        createBookItems();
+    }
+
+    @Transactional
+    public void createAlbumItems() throws IOException {
+        log.info("createAlbumItems()");
         // classpath/csv/book.CSV
         ClassPathResource resource2 = new ClassPathResource("csv/album.CSV");
 
         // 문자열을 모두 받아 List 에 담음. (구분 : 줄바꿈)
         List<String> stringList2 =
                 Files.readAllLines(resource2.getFile().toPath(), StandardCharsets.UTF_8);
-
-        List<Album> albumList = new ArrayList<>();
+        Category category = null;
         for(String s : stringList2){
+            category = categoryRepository.findById((long)(Math.random() * 3) + 5).orElseThrow();
+
             String[] split = s.split("\\|"); //  '\\|' : 정규식에서의 '|'
             Album album = Album.builder()
                     .name(split[0]) // 상품명
                     .imageUrl(split[1]) // 이미지 경로
                     .price(Integer.parseInt(split[2])) // 가격
                     .stackQuantity((int)(Math.random() * 10)) // 수량 (stock) - 0 ~ 9 랜덤
-                    .category(categoryRepository.findById((long)(Math.random() * 3) + 5).orElseThrow()) // 카테고리 8 ~ 11 랜덤
                     .build();
-            albumList.add(album);
-            log.info("Album : {}", album.toString());
+
+            album = albumRepository.save(album);
+            album.setCategory(category);
         }
-        albumRepository.saveAll(albumList);
     }
 
-//    @PostConstruct
-    public void createItems2() throws IOException {
-
+    @Transactional
+    public void createBookItems() throws IOException {
+        log.info("createBookItems()");
         // classpath/csv/book.CSV
         ClassPathResource resource1 = new ClassPathResource("csv/book.CSV");
-
         // 문자열을 모두 받아 List 에 담음. (구분 : 줄바꿈)
         List<String> stringList =
                 Files.readAllLines(resource1.getFile().toPath(), StandardCharsets.UTF_8);
 
-        List<Book> bookList = stringList.stream().map(s -> {
+        stringList.forEach(s -> {
+            Category category = categoryRepository.findById((long)(Math.random() * 4) + 8).orElseThrow();
             String[] split = s.split("\\|"); //  '\\|' : 정규식에서의 '|'
 
-            return Book.builder()
+            Book book = Book.builder()
                     .name(split[0]) // 상품명
                     .imageUrl(split[1]) // 이미지 경로
                     .price(Integer.parseInt(split[2])) // 가격
                     .stackQuantity((int) (Math.random() * 10)) // 수량 (stock) - 0 ~ 9 랜덤
-                    .category(categoryRepository.findById((long)(Math.random() * 4) + 8).orElseThrow()) // 카테고리 8 ~ 11 랜덤
                     .build();
 
-        }).collect(Collectors.toList());
+            bookRepository.save(book);
+            book.setCategory(category);
 
-        bookRepository.saveAll(bookList);
+        });
+
+
     }
 }

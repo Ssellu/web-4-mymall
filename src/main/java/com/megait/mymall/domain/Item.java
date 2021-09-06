@@ -17,7 +17,6 @@ import java.util.List;
 @DynamicUpdate
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
