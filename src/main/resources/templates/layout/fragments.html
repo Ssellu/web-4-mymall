@@ -90,7 +90,10 @@
                         <span class="lead" th:text="*{#numbers.formatInteger(price, 3,'COMMA')}"></span>
                         원
                     </p>
-                    <p class="card-text">
+                    <p th:if="*{stackQuantity == 0}">
+                        <span class="badge badge-pill badge-danger">품절</span>
+                    </p>
+                    <p class="card-text" th:if="*{stackQuantity == 0}">
                         <span class="lead" th:text="*{stackQuantity}"></span>
                         개 남음
                     </p>

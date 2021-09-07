@@ -2,6 +2,7 @@ package com.megait.mymall.controller;
 
 import com.megait.mymall.domain.Album;
 import com.megait.mymall.domain.Book;
+import com.megait.mymall.domain.Item;
 import com.megait.mymall.domain.Member;
 import com.megait.mymall.repository.MemberRepository;
 import com.megait.mymall.service.ItemService;
@@ -64,26 +65,6 @@ public class MainController {
         return "member/login";
     }
 
-
-    /*@GetMapping("/mypage")
-    public String mypage(Model model, Principal principal) {
-        Member member = memberRepository.findByEmail(principal.getName()).orElseThrow();
-        model.addAttribute("member", member);
-        return "member/mypage";
-    }*/
-
-
-    /*
-    @GetMapping("/mypage2")
-    public String mypage(Model model, @AuthenticationPrincipal User user){
-        if(user != null) {
-            Member member = memberRepository.findByEmail(user.getUsername()).orElseThrow();
-            model.addAttribute("member", member);
-        }
-        return "member/mypage";
-    }*/
-
-
     @RequestMapping("/mypage/{email}")
     public String mypage(Model model,
                          @CurrentMember Member member,
@@ -142,5 +123,13 @@ public class MainController {
         return "member/email-check-result";
     }
 
+    @GetMapping("/item/detail/{id}")
+    public String itemDetail(@PathVariable Long id, Model model) {
+        Item item = itemService.findItem(id);
+
+        model.addAttribute("item", item);
+
+        return "/item/detail";
+    }
 
 }
