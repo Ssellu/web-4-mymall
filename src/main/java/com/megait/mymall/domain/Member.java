@@ -72,4 +72,7 @@ public class Member {
         if (orders == null) orders = new ArrayList<>();
     }
 
+    public void addLikeItem(Item item) {
+        likes.add(item);
+    }
 }
