@@ -2,10 +2,7 @@ package com.megait.mymall.controller;
 
 import com.megait.mymall.domain.Album;
 import com.megait.mymall.domain.Book;
-<<<<<<< HEAD
 import com.megait.mymall.domain.Item;
-=======
->>>>>>> 0fded2f2806d48ba2518ccbe0bad6a972b2aee94
 import com.megait.mymall.domain.Member;
 import com.megait.mymall.repository.MemberRepository;
 import com.megait.mymall.service.ItemService;
@@ -126,7 +123,6 @@ public class MainController {
         return "member/email-check-result";
     }
 
-<<<<<<< HEAD
     @GetMapping("/item/detail/{id}")
     public String itemDetail(@PathVariable Long id, Model model) {
         Item item = itemService.findItem(id);
@@ -135,7 +131,5 @@ public class MainController {
 
         return "/item/detail";
     }
-=======
->>>>>>> 0fded2f2806d48ba2518ccbe0bad6a972b2aee94
 
 }
